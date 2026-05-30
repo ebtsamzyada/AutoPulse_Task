@@ -1,3 +1,4 @@
+## Task 01 — Maintenance Record Extraction
 
 An app that extracts maintenance record data from scanned documents using on-device OCR and local pattern matching. No internet or API keys required — works completely offline. 
 
@@ -94,4 +95,43 @@ MaintenanceRecord {
 - **English only** - Arabic text not supported
 - **Handwriting accuracy** - Depends on image quality
 - **No persistence** - Records reviewed but not automatically saved
+
+---
+
+## Task 02 — Predictive Maintenance Schedule
+
+The goal here was to build a personalized maintenance schedule for a 2012 Jeep with 195,000 km based on 4 years of real service history (25 invoices from verified garages).
+
+### Why Not Machine Learning?
+
+The honest answer: we only have one vehicle and ~25 data points. Statistical models like regression need a large population of vehicles to work properly — otherwise they just fit the noise in your data and produce useless predictions. Instead, we built a **rule-based multiplicative degradation model** grounded in actual engineering literature and validated against what actually happened to this vehicle.
+
+### Why Multiplicative Degradation?
+
+Wear doesn't add up — it compounds. Running an engine on hot degraded oil in dusty air kills it faster than running it on hot oil alone, or dusty air alone. Multiplying the stress factors together captures this interaction correctly. If we just added them up, we'd be too optimistic about what this vehicle can handle.
+
+### How We Calibrated the Multipliers
+
+Two things informed every number:
+
+1. **Engineering & OEM specs** — SAE tribology papers tell us oil degrades exponentially above 110°C, Jeep's severe-duty guidelines give baseline intervals, etc.
+
+2. **The actual service history as ground truth** — We looked at what actually failed and when:
+   - **Cooling system:** Radiator failed Dec 2024, manifold gasket Mar 2025, coolant flushed twice → clearly thermal overstress → tightened coolant interval
+   - **Brake pads:** Lasted from ~133,000 km to 175,851 km with zero prior replacement → smooth, gentle braking confirmed → extended pad life multiplier
+   - **Tie rods:** Replaced at 164,092 km instead of the typical 80,000+ km life → but the service history shows constant bump damage on Egyptian roads → confirmed the hard-impact multiplier is real
+   - **Oil intervals:** Observed 6,000–8,000 km gaps with evidence of thermal stress → justified the 2,500 km adjusted interval
+
+### Key Decisions We Made
+
+| What We Did | Why |
+|---|---|
+| **Oil → 2,500 km** | Overspeeding (0.70) × urban Cairo (0.85) × high mileage (0.90) = 0.535 of the baseline 5,000 km |
+| **Shocks/ball joints reset from 196,772 km** | They were just replaced Aug 2025 — starting the count from the baseline 195,000 km would be cheating |
+| **Brake pads reset from 175,851 km** | Replaced Jun 2024, already 19,149 km consumed — track the new life, not the whole life |
+| **Cooling interval tightened** | Three failures in 12 months means this system is maxed out; can't relax |
+| **Smooth braking extends pad life ~40%** | No replacement found in 42k km of recorded history — the data supports it |
+| **Skip service listed separately** | Current overdue items (oil, air filter) are deficiencies, not future wear rates — handled as Day 0 emergencies |
+
+The point: every decision ties back to something observable in the real invoices.
 
