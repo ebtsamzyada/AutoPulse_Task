@@ -167,29 +167,6 @@ Adjusted Interval = OEM Baseline × M₁ × M₂ × ... × Mₙ
 
 ---
 
-## Files
-
-- **AutoPulse_Task02_Predictive_Maintenance.pdf** — Full report with:
-  - Section 01: Parsed service history (25 invoices, 3 garages)
-  - Section 02: Modelling logic & variable accounting
-  - Section 03: Adjusted maintenance schedule (next 80k km)
-  - Section 04: Chronological service timeline
-  - Section 05: Key findings & recommendations
-
-- **generate_report.py** *(to be added)* — Script that produced the PDF (all calculations documented)
-
----
-
-## How It Works
-
-1. **Parse invoices** → extract dates, ODO, service type, cost
-2. **Identify driving profile** → overspeeding (cooling failures), bump stress (suspension wear), braking style (pad life)
-3. **Identify environment** → urban Cairo, dust, stop-start
-4. **Apply multipliers** → each component gets its own M₁ × M₂ × ... × Mₙ
-5. **Generate schedule** → prioritized (CRITICAL/HIGH/MEDIUM/LOW) + chronological timeline
-
----
-
 ## Limitations
 
 - **One vehicle only** — Multipliers derived from this vehicle's history; generalization needs fleet data
